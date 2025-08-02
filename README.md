@@ -1,6 +1,6 @@
 # If I Get Fired Calculator
 Python Flask app that tells how long could you survive without a paycheck
-
+```
 if-i-get-fired-calculator/
 │
 ├── app.py                      # Main Flask application
@@ -8,3 +8,4 @@ if-i-get-fired-calculator/
 │
 ├── templates/                  # HTML templates
 │   └── index.html              # Main calculator page
+```
