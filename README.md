@@ -2,6 +2,7 @@
 Python Flask app that tells how long could you survive without a paycheck
 ### 🌐 Website  
 [https://survivewithoutjob.the-d2.com](https://survivewithoutjob.the-d2.com) 
+
 <img width="500" height="500" alt="Survive without job Finanance calculator by Navdeep D2" src="https://github.com/user-attachments/assets/fa738597-f540-4c8f-abe5-a7d6bf8eec0a" />
 
 ## Directory Structure
