@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>If I Get Fired Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; }
+    .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 12px; }
+    .form-control, .btn { border-radius: 10px; }
+    .leaderboard { max-height: 400px; overflow-y: auto; }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e9ecef;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+    .highlight-green {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .highlight-red {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    @media (max-width: 576px) {
+      h2 { font-size: 1.5rem; }
+      .card { padding: 1rem !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="container py-4">
+  <h2 class="text-center mb-4">🔥 If I Get Fired Calculator</h2>
+
+  {% if message %}
+    <div class="alert alert-danger text-center">{{ message }}</div>
+  {% endif %}
+
+  <form method="post">
+    <div class="row g-4">
+      <!-- Assets -->
+      <div class="col-12 col-md-4 order-2 order-md-1">
+        <div class="card p-4 h-100">
+          <h5 class="mb-3">Assets</h5>
+          <div class="mb-3">
+            <label class="form-label">Your Name</label>
+            <input type="text" class="form-control" name="name" placeholder="e.g., John">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Savings Account (₹)</label>
+            <input type="number" step="any" class="form-control" name="savings">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stocks (₹)</label>
+            <input type="number" step="any" class="form-control" name="mutual">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mutual Funds (₹)</label>
+            <input type="number" step="any" class="form-control" name="ppf">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Other Liquid Assets (₹)</label>
+            <input type="number" step="any" class="form-control" name="others">
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses -->
+      <div class="col-12 col-md-4 order-3 order-md-2">
+        <div class="card p-4 h-100">
+          <h5 class="mb-3">Expenses</h5>
+          <div class="mb-3">
+            <label class="form-label">Rent / month (₹)</label>
+            <input type="number" step="any" class="form-control" name="rent">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Food / month (₹)</label>
+            <input type="number" step="any" class="form-control" name="food">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Transportation / month (₹)</label>
+            <input type="number" step="any" class="form-control" name="car">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Subscriptions and Other Bills / month (₹)</label>
+            <input type="number" step="any" class="form-control" name="subs">
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-2">Calculate</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard + Results -->
+      <div class="col-12 col-md-4 order-1 order-md-3">
+        <div class="card p-4 leaderboard h-100">
+          <h5 class="mb-3">🏆 Survival Stats (Recent 25)</h5>
+          <ul id="leaderboard-list" class="list-group">
+            <li class="list-group-item text-muted">Loading...</li>
+          </ul>
+        </div>
+
+        {% if survival_data %}
+        <div class="card mt-4 p-4 text-center" id="result-section">
+          <div class="alert alert-success">
+            You can survive for <strong>{{ survival_data.months }} months</strong>
+            (~{{ survival_data.years }} years) without income.
+          </div>
+          <div class="my-2 fw-bold">
+            Total Assets:
+            <span class="highlight-green">₹{{ "{:.2f}".format(total_assets / 100000) }} Lakh</span>
+          </div>
+          <div class="my-2 fw-bold">
+            Total Expenses:
+            <span class="highlight-red">₹{{ "{:,.0f}".format(total_expenses) }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+<p class="text-center text-muted mt-4" style="font-size: 0.85rem;">
+  🔒 <strong>Privacy Note:</strong> I'm <u>not</u> saving individual inputs. Only the <strong>final result (Months/Years)</strong> is stored to show in the leaderboard.
+</p>
+<footer>
+  Developed by <a href="https://www.linkedin.com/in/navdeepd2/" target="_blank">Navdeep Singh</a>
+</footer>
+
+<script>
+function updateLeaderboard() {
+  fetch('/results')
+    .then(response => response.json())
+    .then(data => {
+      const list = document.getElementById('leaderboard-list');
+      list.innerHTML = '';
+      if (data.length === 0) {
+        list.innerHTML = '<li class="list-group-item text-muted">No results yet.</li>';
+      } else {
+        data.forEach(entry => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `<span>${entry.name}</span><span>${entry.months} mo / ${entry.years} yrs</span>`;
+          list.appendChild(li);
+        });
+      }
+    });
+}
+updateLeaderboard();
+setInterval(updateLeaderboard, 10000);
+
+// Auto-scroll to results
+{% if survival_data %}
+window.onload = function () {
+  const resultCard = document.getElementById('result-section');
+  if (resultCard) {
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+{% endif %}
+</script>
+</body>
+</html>
