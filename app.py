@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import json
 import os
 from datetime import datetime
-
+# Developed by https://www.linkedin.com/in/navdeepd2
 app = Flask(__name__)
 RESULTS_FILE = 'results.txt'
 MAX_RESULTS = 25
@@ -71,3 +71,4 @@ def results():
 
 if __name__ == '__main__':
     app.run(debug=True, port=4630)
+
